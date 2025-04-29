@@ -1,0 +1,9 @@
+telethon==1.31.1
+python-telegram-bot==20.7
+python-dotenv==1.0.0
+SQLAlchemy==2.0.23
+cryptography==41.0.5
+aiohttp==3.9.1
+python-socks==2.4.3
+loguru==0.7.2
+pydantic==2.5.2 
