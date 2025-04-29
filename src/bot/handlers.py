@@ -305,4 +305,13 @@ class BotHandlers:
         await update.callback_query.message.reply_text(
             get_failed_links_message([link.url for link in failed_links]),
             reply_markup=get_error_details_menu()
+        )
+
+    async def main_menu(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        """
+        Обработчик возврата в главное меню по кнопке 'Назад'
+        """
+        await update.callback_query.message.edit_text(
+            get_welcome_message(),
+            reply_markup=get_main_menu()
         ) 
