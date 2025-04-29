@@ -4,39 +4,12 @@ from urllib.parse import urlparse
 
 def validate_telegram_link(link: str) -> Tuple[bool, str]:
     """
-    Валидирует ссылку на Telegram чат/канал
-    Возвращает (is_valid, error_message)
+    Проверяет, является ли ссылка валидной для Telegram (принимает @, t.me/, http, https)
     """
-    # Удаляем пробелы
     link = link.strip()
-    
-    # Проверяем формат @username
-    if link.startswith('@'):
-        username = link[1:]
-        if re.match(r'^[a-zA-Z0-9_]{5,32}$', username):
-            return True, ""
-        return False, "Неверный формат username"
-        
-    # Проверяем формат t.me ссылки
-    if 't.me/' in link:
-        try:
-            parsed = urlparse(link)
-            if parsed.netloc == 't.me':
-                path = parsed.path.strip('/')
-                if path:
-                    return True, ""
-        except:
-            pass
-        return False, "Неверный формат t.me ссылки"
-        
-    # Проверяем формат invite ссылки
-    if '+' in link:
-        invite_hash = link.split('+')[-1]
-        if re.match(r'^[a-zA-Z0-9_-]{10,}$', invite_hash):
-            return True, ""
-        return False, "Неверный формат invite ссылки"
-        
-    return False, "Неверный формат ссылки"
+    if link.startswith('@') or link.startswith('t.me/') or link.startswith('https://t.me/') or link.startswith('http://t.me/') or link.startswith('http://') or link.startswith('https://'):
+        return True, ""
+    return False, "Невалидная ссылка"
 
 def validate_links(links: List[str]) -> Tuple[List[str], List[str]]:
     """

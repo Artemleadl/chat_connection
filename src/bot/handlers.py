@@ -200,7 +200,7 @@ class BotHandlers:
         valid_links, invalid_links = validate_links(links)
         if not valid_links:
             await update.message.reply_text(
-                get_error_message("Не найдено валидных ссылок")
+                get_error_message("Ни одна из ссылок не прошла валидацию. Проверьте формат: @username, t.me/..., https://...")
             )
             return
         # Get account
