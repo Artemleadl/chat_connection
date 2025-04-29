@@ -71,18 +71,21 @@ class BotHandlers:
             links = text.split("\n")
             valid_links, invalid_links = validate_links(links)
             logger.info(f"handle_account_input: valid_links={valid_links}, invalid_links={invalid_links}")
+            # Логируем контекст и phone
+            logger.info(f"DEBUG: context.user_data={context.user_data}")
+            phone = context.user_data.get("phone")
+            logger.info(f"DEBUG: phone={phone}")
+            if not phone and update.effective_user.id in self.active_accounts:
+                account_manager = self.active_accounts[update.effective_user.id]
+                phone = account_manager.client.session.filename.split("/")[-1].replace(".session", "")
+            account = self.db_ops.get_account(phone)
+            logger.info(f"DEBUG: account from DB={account}")
             if not valid_links:
                 await update.message.reply_text(
                     get_error_message("Ни одна из ссылок не прошла валидацию. Проверьте формат: @username, t.me/..., https://...")
                 )
                 context.user_data["state"] = None
                 return
-            # Get account
-            phone = context.user_data.get("phone")
-            if not phone and update.effective_user.id in self.active_accounts:
-                account_manager = self.active_accounts[update.effective_user.id]
-                phone = account_manager.client.session.filename.split("/")[-1].replace(".session", "")
-            account = self.db_ops.get_account(phone)
             if not account:
                 await update.message.reply_text(
                     get_error_message("Аккаунт не найден в базе данных")
