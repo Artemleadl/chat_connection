@@ -61,10 +61,47 @@ class BotHandlers:
 
     async def handle_account_input(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """
-        Обработчик ввода номера телефона и кода подтверждения
+        Обработчик ввода номера телефона, кода подтверждения и ссылок
         """
         state = context.user_data.get("state")
         text = update.message.text.strip()
+        logger.info(f"handle_account_input: state={state}, text={text}")
+
+        if state == "waiting_for_links":
+            links = text.split("\n")
+            valid_links, invalid_links = validate_links(links)
+            logger.info(f"handle_account_input: valid_links={valid_links}, invalid_links={invalid_links}")
+            if not valid_links:
+                await update.message.reply_text(
+                    get_error_message("Ни одна из ссылок не прошла валидацию. Проверьте формат: @username, t.me/..., https://...")
+                )
+                context.user_data["state"] = None
+                return
+            # Get account
+            phone = context.user_data.get("phone")
+            if not phone and update.effective_user.id in self.active_accounts:
+                account_manager = self.active_accounts[update.effective_user.id]
+                phone = account_manager.client.session.filename.split("/")[-1].replace(".session", "")
+            account = self.db_ops.get_account(phone)
+            if not account:
+                await update.message.reply_text(
+                    get_error_message("Аккаунт не найден в базе данных")
+                )
+                context.user_data["state"] = None
+                return
+            # Save links
+            saved_links = self.db_ops.add_links(account.id, valid_links)
+            if saved_links:
+                await update.message.reply_text(
+                    get_links_added_message(len(saved_links)),
+                    reply_markup=get_main_menu()
+                )
+            else:
+                await update.message.reply_text(
+                    get_error_message("Не удалось сохранить ссылки")
+                )
+            context.user_data["state"] = None
+            return
 
         if state == "waiting_for_phone":
             if not text.startswith("+") or not text[1:].isdigit():
@@ -189,44 +226,6 @@ class BotHandlers:
             get_links_add_message()
         )
         context.user_data["state"] = "waiting_for_links"
-        
-    async def handle_links_input(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
-        """
-        Обработчик ввода ссылок
-        """
-        if context.user_data.get("state") != "waiting_for_links":
-            return
-        links = update.message.text.strip().split("\n")
-        valid_links, invalid_links = validate_links(links)
-        if not valid_links:
-            await update.message.reply_text(
-                get_error_message("Ни одна из ссылок не прошла валидацию. Проверьте формат: @username, t.me/..., https://...")
-            )
-            return
-        # Get account
-        phone = context.user_data.get("phone")
-        if not phone and update.effective_user.id in self.active_accounts:
-            # Вытаскиваем phone из сессии аккаунта
-            account_manager = self.active_accounts[update.effective_user.id]
-            phone = account_manager.client.session.filename.split("/")[-1].replace(".session", "")
-        account = self.db_ops.get_account(phone)
-        if not account:
-            await update.message.reply_text(
-                get_error_message("Аккаунт не найден в базе данных")
-            )
-            return
-        # Save links
-        saved_links = self.db_ops.add_links(account.id, valid_links)
-        if saved_links:
-            await update.message.reply_text(
-                get_links_added_message(len(saved_links)),
-                reply_markup=get_main_menu()
-            )
-        else:
-            await update.message.reply_text(
-                get_error_message("Не удалось сохранить ссылки")
-            )
-        context.user_data["state"] = None
         
     async def start_joining(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
         """
