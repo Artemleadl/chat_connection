@@ -131,10 +131,7 @@ class BotHandlers:
                     if not account:
                         account = self.db_ops.create_account(
                             phone=text,
-                            session_file=f"sessions/{text}.session",
-                            account_type="unknown",
-                            groups_limit=0,
-                            current_groups=0
+                            session_file=f"sessions/{text}.session"
                         )
                     self.active_accounts[update.effective_user.id] = account_manager
                     await update.message.reply_text(
@@ -158,10 +155,7 @@ class BotHandlers:
                 if success:
                     account = self.db_ops.create_account(
                         phone=phone,
-                        session_file=f"sessions/{phone}.session",
-                        account_type=account_type,
-                        groups_limit=groups_limit,
-                        current_groups=groups_count
+                        session_file=f"sessions/{phone}.session"
                     )
                     if account:
                         self.active_accounts[update.effective_user.id] = account_manager
