@@ -11,20 +11,14 @@ class DatabaseOperations:
     def __init__(self, db: Session):
         self.db = db
         
-    def create_account(self, phone: str, session_file: str, 
-                      account_type: str, groups_limit: int, 
-                      current_groups: int) -> Optional[Account]:
+    def create_account(self, phone: str, session_file: str) -> Optional[Account]:
         """
         Создает новый аккаунт в базе данных
         """
         try:
             account = Account(
                 phone=phone,
-                session_file=session_file,
-                account_type=account_type,
-                groups_limit=groups_limit,
-                current_groups=current_groups,
-                last_check=datetime.utcnow()
+                session_file=session_file
             )
             
             self.db.add(account)
