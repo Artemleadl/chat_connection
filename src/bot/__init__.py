@@ -37,6 +37,12 @@ def create_bot() -> Application:
     application.add_handler(CallbackQueryHandler(handlers.cancel_joining, pattern="^cancel_joining$"))
     application.add_handler(CallbackQueryHandler(handlers.show_errors, pattern="^show_errors$"))
     application.add_handler(CallbackQueryHandler(handlers.main_menu, pattern="^main_menu$"))
+    application.add_handler(CallbackQueryHandler(handlers.check_status, pattern="^check_status$"))
+    application.add_handler(CallbackQueryHandler(handlers.delete_account, pattern="^delete_account$"))
+    application.add_handler(CallbackQueryHandler(handlers.confirm_action, pattern="^confirm_.*$"))
+    application.add_handler(CallbackQueryHandler(handlers.cancel_action, pattern="^cancel$"))
+    application.add_handler(CallbackQueryHandler(handlers.show_failed_links, pattern="^show_failed_links$"))
+    application.add_handler(CallbackQueryHandler(handlers.show_error_reasons, pattern="^show_error_reasons$"))
     
     # Add message handlers
     application.add_handler(MessageHandler(

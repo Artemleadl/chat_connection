@@ -310,4 +310,22 @@ class BotHandlers:
         await update.callback_query.message.edit_text(
             get_welcome_message(),
             reply_markup=get_main_menu()
-        ) 
+        )
+
+    async def check_status(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.callback_query.answer("Функция проверки статуса в разработке.")
+
+    async def delete_account(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.callback_query.answer("Функция удаления аккаунта в разработке.")
+
+    async def confirm_action(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.callback_query.answer("Функция подтверждения в разработке.")
+
+    async def cancel_action(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.callback_query.answer("Действие отменено.")
+
+    async def show_failed_links(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.callback_query.answer("Показать ссылки с ошибками — функция в разработке.")
+
+    async def show_error_reasons(self, update: Update, context: ContextTypes.DEFAULT_TYPE):
+        await update.callback_query.answer("Показать причины ошибок — функция в разработке.") 
